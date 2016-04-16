@@ -3,7 +3,7 @@ import vis
 from visual import *
 from visual.controls import *
 
-# globals
+# globalsasdasda
 global state
 global horSpring
 global verSpring
