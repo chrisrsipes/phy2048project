@@ -87,7 +87,7 @@ def setK(sliderK, springData):
 
 def setStretch(sliderStretch, springData):
     springData.setSpringStretch(sliderStretch.value)
-    springData.updateAssociatedLabelText
+    springData.updateAssociatedLabelText()
 
 def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength):
     global isRunning
