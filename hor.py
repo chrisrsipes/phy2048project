@@ -83,8 +83,11 @@ def setK(sliderK, springData):
     springData.setK(sliderK.value)
     springData.updateAssociatedLabelText()
 
-def setStretch(sliderStretch, springData):
-    springData.setSpringStretch(sliderStretch.value)
+# setStretch(sliderStretch, springData, spring, sBox, relaxedLength, stretchOffset), color = color.blue, value = stretch[0])
+def setStretch(sliderStretch, springData, spring, sBox, relaxedLength, stretchOffset):
+    springData.setSpringStretch(vector(sliderStretch.value, 0, 0))
+    sBox.pos = springData.getSpringStretch() + relaxedLength
+    spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset)
     springData.updateAssociatedLabelText()
 
 def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
@@ -96,20 +99,12 @@ def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
         pBox = vector(0, 0, 0)
         while (count < 1000):
             rate(100)
-            print count
-            print 'springStretch'
-            print springData.getSpringStretch()
             # Fnet = -1 * springData.getK() * (sBox.pos - horSpringLength)
             Fnet = -1 * springData.getK() * springData.getSpringStretch()
-            print 'fnet is okay'
             pBox = pBox + Fnet * deltat
-            print 'pbox is okay'
             sBox.pos = sBox.pos + (pBox / boxMass) * deltat
-            print 'sBox.pos is okay'
             springData.setSpringStretch(sBox.pos - relaxedLength)
-            print 'setting spring stretch is okay'
             spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset)
-            print 'spring axis is okay'
             count += 1
 
         isRunning = False
@@ -126,6 +121,6 @@ springData.updateAssociatedLabelText()
 
 c = controls(title="Configure Spring Attributes", width=300, height=400)
 sliderK = slider(pos = (-50, 0), width=7, length=120, axis=(1,0), min=0.1, max=10, text="Spring constant", action=lambda: setK(sliderK, springData), color = color.red, value = k)
-sliderStretch = slider(pos = (-50, 10), width=7, length=120, axis=(1,0), min=0.1, max=10, text="Spring constant", action=lambda: setStretch(sliderStretch, springData), color = color.blue, value = stretch[0])
+sliderStretch = slider(pos = (-50, 10), width=7, length=120, axis=(1,0), min=-0.5, max=0.5, text="Spring constant", action=lambda: setStretch(sliderStretch, springData, spring, sBox, relaxedLength, stretchOffset), color = color.blue, value = stretch[0])
 buttonRun = button( pos=(0,60), width=120, height=40, border=0,
               text='Run Demo', action=lambda: runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis) )
