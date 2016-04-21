@@ -36,6 +36,8 @@ class SpringData(object):
     orientation = ''
     k = 0.1
     stretch = 0
+    Fnet = None
+    pBox = None
 
     def __init__(self, associatedLabel, orientation, k, stretch):
         self.associatedLabel = associatedLabel
@@ -47,7 +49,9 @@ class SpringData(object):
         line1 = 'Orientation : ' + str(self.orientation) + '\n'
         line2 = 'Spring Const: ' + str(self.k) + '\n'
         line3 = 'Stretch: ' + str(self.springStretch) + '\n'
-        return line1 + line2 + line3
+        line4 = 'Momentum: ' + str(self.pBox) + '\n'
+        line5 = 'Fnet: ' + str(self.Fnet) + '\n'
+        return line1 + line2 + line3 + line4 + line5
 
     def updateAssociatedLabelText(self):
         if (self.associatedLabel != None):
@@ -79,6 +83,19 @@ class SpringData(object):
     def setSpring(self, spring):
         self.spring = spring
 
+    def getPBox(self):
+        return self.pBox
+
+    def setPBox(self, pBox):
+        self.pBox = pBox
+
+    def getFnet(self):
+        return self.Fnet
+
+    def setFnet(self, Fnet):
+        self.Fnet = Fnet
+
+
 def setK(sliderK, springData):
     springData.setK(sliderK.value)
     springData.updateAssociatedLabelText()
@@ -97,6 +114,7 @@ def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
 
         count = 0
         pBox = vector(0, 0, 0)
+        springData.setPBox(pBox)
         while (count < 1000):
             rate(100)
             # Fnet = -1 * springData.getK() * (sBox.pos - horSpringLength)
@@ -105,6 +123,9 @@ def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
             sBox.pos = sBox.pos + (pBox / boxMass) * deltat
             springData.setSpringStretch(sBox.pos - relaxedLength)
             spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset)
+            springData.setPBox(pBox)
+            springData.setFnet(Fnet)
+            springData.updateAssociatedLabelText()
             count += 1
 
         isRunning = False
