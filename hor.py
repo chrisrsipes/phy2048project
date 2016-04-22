@@ -7,6 +7,9 @@ from visual.controls import *
 scene.width = 1024
 scene.height = 760
 scene.x = 350
+scene.center = vector(0,0,0)
+
+sceneOffset = vector(0.5, 0, 0)
 
 ### constants
 deltat = 0.1
@@ -27,8 +30,8 @@ horDispConst = vector(0.1001, 0, 0)
 global isRunning
 isRunning = False
 
-def calcAxis(relaxedLength, boxPos, stretchOffset):
-    return relaxedLength + boxPos + stretchOffset
+def calcAxis(relaxedLength, boxPos, stretchOffset, sceneOffset):
+    return relaxedLength + boxPos + stretchOffset + sceneOffset
 
 # class to manage the configurables
 class SpringData(object):
@@ -104,10 +107,10 @@ def setK(sliderK, springData):
 def setStretch(sliderStretch, springData, spring, sBox, relaxedLength, stretchOffset):
     springData.setSpringStretch(vector(sliderStretch.value, 0, 0))
     sBox.pos = springData.getSpringStretch() + relaxedLength
-    spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset)
+    spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset, sceneOffset)
     springData.updateAssociatedLabelText()
 
-def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
+def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis, sceneOffset):
     global isRunning
     if (isRunning == False):
         isRunning = True
@@ -122,7 +125,7 @@ def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
             pBox = pBox + Fnet * deltat
             sBox.pos = sBox.pos + (pBox / boxMass) * deltat
             springData.setSpringStretch(sBox.pos - relaxedLength)
-            spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset)
+            spring.axis = calcAxis(relaxedLength, sBox.pos, stretchOffset, sceneOffset)
             springData.setPBox(pBox)
             springData.setFnet(Fnet)
             springData.updateAssociatedLabelText()
@@ -131,10 +134,10 @@ def runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis):
         isRunning = False
 
 # visual elements
-sBox = box(pos = horSpringLength + stretch, size = (0.3,0.3,0.3), color = color.yellow)
-spring = helix(pos = vector(-0.75,0,0), axis = calcAxis(relaxedLength, sBox.pos, stretchOffset), radius = 0.1, coils = 8, thickness = 0.01, color = color.red)
-ground = box(size=(1.5,0.02,0.5), pos=(-0.05,-0.16,0))
-wall = box(size=(0.04,0.5,0.3),pos=(-0.77,0.1,0),color=color.white)
+sBox = box(pos = horSpringLength + stretch - sceneOffset, size = (0.3,0.3,0.3), color = color.yellow)
+spring = helix(pos = vector(-0.75,0,0) - sceneOffset, axis = calcAxis(relaxedLength, sBox.pos, stretchOffset, sceneOffset), radius = 0.1, coils = 8, thickness = 0.01, color = color.red)
+ground = box(size=(2.5,0.02,0.5), pos=vector(.45,-0.16,0) - sceneOffset)
+wall = box(size=(0.04,0.5,0.3),pos=vector(-0.77,0.1,0) - sceneOffset,color=color.white)
 
 attributesLabel = label(pos = scene.center, color = color.white, height = 10, border = 6, display = scene)
 springData = SpringData(attributesLabel, 'horizontal', k, stretch)
@@ -144,4 +147,4 @@ c = controls(title="Configure Spring Attributes", width=300, height=400)
 sliderK = slider(pos = (-50, 0), width=7, length=120, axis=(1,0), min=0.1, max=10, text="Spring constant", action=lambda: setK(sliderK, springData), color = color.red, value = k)
 sliderStretch = slider(pos = (-50, 10), width=7, length=120, axis=(1,0), min=-0.5, max=0.5, text="Spring constant", action=lambda: setStretch(sliderStretch, springData, spring, sBox, relaxedLength, stretchOffset), color = color.blue, value = stretch[0])
 buttonRun = button( pos=(0,60), width=120, height=40, border=0,
-              text='Run Demo', action=lambda: runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis) )
+              text='Run Demo', action=lambda: runDemo(springData, spring, sBox, deltat, boxMass, relaxedLength, calcAxis, sceneOffset) )
